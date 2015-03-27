@@ -38,7 +38,19 @@
             <argument />
         </service>
 
+        <service id="sonata.media.cdn.s3" class="Sonata\MediaBundle\CDN\S3">
+            <argument />
+            <argument />
+            <argument />
+            <argument />
+            <argument />
+        </service>
+
         <service id="sonata.media.cdn.cloudfront" class="Sonata\MediaBundle\CDN\CloudFront">
+            <argument />
+            <argument />
+            <argument />
+            <argument />
             <argument />
             <argument />
             <argument />

@@ -116,12 +116,26 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
 
+                        ->arrayNode('s3')
+                            ->children()
+                                ->scalarNode('bucket')->isRequired()->end()
+                                ->scalarNode('directory')->isRequired()->end()
+                                ->scalarNode('accessKey')->isRequired()->end()
+                                ->scalarNode('secretKey')->isRequired()->end()
+                                ->scalarNode('expiration_interval')->defaultNull()->end()
+                            ->end()
+                        ->end()
+
                         ->arrayNode('cloudfront')
                             ->children()
-                                ->scalarNode('path')->isRequired()->end() // http://xxxxxxxxxxxxxx.cloudfront.net/uploads/media
+                                ->scalarNode('host_url')->isRequired()->end() // http://xxxxxxxxxxxxxx.cloudfront.net/
+                                ->scalarNode('directory')->isRequired()->end()
+                                ->scalarNode('accessKey')->isRequired()->end()
+                                ->scalarNode('secretKey')->isRequired()->end()
                                 ->scalarNode('distribution_id')->isRequired()->end()
-                                ->scalarNode('key')->isRequired()->end()
-                                ->scalarNode('secret')->isRequired()->end()
+                                ->scalarNode('expiration_interval')->defaultNull()->end()
+                                ->scalarNode('private_key')->isRequired()->end()
+                                ->scalarNode('key_pair_id')->isRequired()->end()
                             ->end()
                         ->end()
 

@@ -48,36 +48,67 @@ class CloudFront implements CDNInterface
     /**
      * @var string
      */
-    protected $path;
+    protected $hostUrl;
+
+    /**
+     * @var string
+     */
+    protected $directory;
+
     /**
      * @var string
      */
     protected $key;
+
     /**
      * @var string
      */
     protected $secret;
+
     /**
      * @var string
      */
     protected $distributionId;
+
+    /**
+     * @var interval
+     */
+    protected $expirationInterval;
+
+    /**
+     * @var string
+     */
+    protected $privateKey;
+
+    /**
+     * @var string
+     */
+    protected $keyPairId;
+
     /**
      * @var CloudFrontClient
      */
     protected $client;
 
     /**
-     * @param string $path
-     * @param string $key
-     * @param string $secret
-     * @param string $distributionId
+     * @param string  $hostUrl
+     * @param string  $directory
+     * @param string  $key
+     * @param string  $secret
+     * @param string  $distributionId
+     * @param integer $expirationInterval
+     * @param string  $privateKey
+     * @param string  $keyPairId
      */
-    public function __construct($path, $key, $secret, $distributionId)
+    public function __construct($host, $directory, $key, $secret, $distributionId, $expirationInterval, $privateKey, $keyPairId)
     {
-        $this->path = $path;
-        $this->key = $key;
+        $this->host = $host;
+        $this->directory = $directory;
         $this->secret = $secret;
         $this->distributionId = $distributionId;
+        $this->expirationInterval = $expirationInterval;
+        $this->privateKey = $privateKey;
+        $this->keyPairId = $keyPairId;
     }
 
     /**
@@ -85,7 +116,16 @@ class CloudFront implements CDNInterface
      */
     public function getPath($relativePath, $isFlushable = false)
     {
-        return sprintf('%s/%s', rtrim($this->path, '/'), ltrim($relativePath, '/'));
+        $url = sprintf('%s/%s', rtrim($this->host, '/'), ltrim($this->computePath($relativePath), '/'));
+
+        if (!(is_null($this->expirationInterval) || is_null($this->privateKey) || is_null($this->keyPairId))) {
+            $url = $this->getClient()->getSignedUrl(array(
+                'url'     => $url,
+                'expires' => time() + (int) $this->expirationInterval
+            ));
+        }
+
+        return $url;
     }
 
     /**
@@ -148,10 +188,19 @@ class CloudFront implements CDNInterface
     private function getClient()
     {
         if (!$this->client) {
-            $this->client = CloudFrontClient::factory(array(
+            $options = array(
                 'key'    => $this->key,
                 'secret' => $this->secret
-            ));
+            );
+
+            if (!(is_null($this->expirationInterval) || is_null($this->privateKey) || is_null($this->keyPairId))) {
+                $options = array_merge($options, array(
+                    'private_key' => $this->privateKey,
+                    'key_pair_id' => $this->keyPairId
+                ));
+            }
+
+            $this->client = CloudFrontClient::factory($options);
         }
 
         return $this->client;
@@ -215,5 +264,19 @@ class CloudFront implements CDNInterface
             self::STATUS_ERROR    => 'STATUS_ERROR',
             self::STATUS_WAITING  => 'InProgress',
         );
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
+    protected function computePath($key)
+    {
+        if (empty($this->directory)) {
+            return $key;
+        }
+
+        return sprintf('%s/%s', $this->directory, $key);
     }
 }

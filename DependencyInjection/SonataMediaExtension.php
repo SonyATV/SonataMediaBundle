@@ -289,12 +289,28 @@ class SonataMediaExtension extends Extension
             $container->removeDefinition('sonata.media.cdn.panther');
         }
 
+        if ($container->hasDefinition('sonata.media.cdn.s3') && isset($config['cdn']['s3'])) {
+            $container->getDefinition('sonata.media.cdn.s3')
+                ->replaceArgument(0, $config['cdn']['s3']['bucket'])
+                ->replaceArgument(1, $config['cdn']['s3']['directory'])
+                ->replaceArgument(2, $config['cdn']['s3']['accessKey'])
+                ->replaceArgument(3, $config['cdn']['s3']['secretKey'])
+                ->replaceArgument(4, $config['cdn']['s3']['expiration_interval'])
+            ;
+        } else {
+            $container->removeDefinition('sonata.media.cdn.s3');
+        }
+
         if ($container->hasDefinition('sonata.media.cdn.cloudfront') && isset($config['cdn']['cloudfront'])) {
             $container->getDefinition('sonata.media.cdn.cloudfront')
-                ->replaceArgument(0, $config['cdn']['cloudfront']['path'])
-                ->replaceArgument(1, $config['cdn']['cloudfront']['key'])
-                ->replaceArgument(2, $config['cdn']['cloudfront']['secret'])
-                ->replaceArgument(3, $config['cdn']['cloudfront']['distribution_id'])
+                ->replaceArgument(0, $config['cdn']['cloudfront']['host_url'])
+                ->replaceArgument(1, $config['cdn']['cloudfront']['directory'])
+                ->replaceArgument(2, $config['cdn']['cloudfront']['accessKey'])
+                ->replaceArgument(3, $config['cdn']['cloudfront']['secretKey'])
+                ->replaceArgument(4, $config['cdn']['cloudfront']['distribution_id'])
+                ->replaceArgument(5, $config['cdn']['cloudfront']['expiration_interval'])
+                ->replaceArgument(6, $config['cdn']['cloudfront']['private_key'])
+                ->replaceArgument(7, $config['cdn']['cloudfront']['key_pair_id'])
             ;
         } else {
             $container->removeDefinition('sonata.media.cdn.cloudfront');
