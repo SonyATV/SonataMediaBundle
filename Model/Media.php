@@ -86,6 +86,11 @@ abstract class Media implements MediaInterface
     protected $cdnIsFlushable;
 
     /**
+     * @var string $cdn_flush_identifier
+     */
+    protected $cdnFlushIdentifier;
+
+    /**
      * @var datetime $cdn_flush_at
      */
     protected $cdnFlushAt;
@@ -417,6 +422,22 @@ abstract class Media implements MediaInterface
     public function getCdnIsFlushable()
     {
         return $this->cdnIsFlushable;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCdnFlushIdentifier($cdnFlushIdentifier)
+    {
+        $this->cdnFlushIdentifier = $cdnFlushIdentifier;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCdnFlushIdentifier()
+    {
+        return $this->cdnFlushIdentifier;
     }
 
     /**
